@@ -6,9 +6,9 @@ var app = express();
 app.use(bodyParser());
 
 var todos = [
-	{id: 1, title: 'Learn Ember.js', isCompleted: true},
- 	{id: 2, title: '...', isCompleted: false},
- 	{id: 3, title: 'Profit!', isCompleted: false}
+	{"post": {id: 1, title: 'Learn Ember.js', isCompleted: true}},
+ 	{"post": {id: 2, title: '...', isCompleted: false}},
+ 	{"post": {id: 3, title: 'Profit!', isCompleted: false}}
 ];
 
 app.get('/', function(req, res){
