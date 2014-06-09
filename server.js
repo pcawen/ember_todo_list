@@ -5,13 +5,22 @@ var app = express();
 
 app.use(bodyParser());
 
+
 var todos = [
-	{"post": {id: 1, title: 'Learn Ember.js', isCompleted: true}},
- 	{"post": {id: 2, title: '...', isCompleted: false}},
- 	{"post": {id: 3, title: 'Profit!', isCompleted: false}}
+	{"id": 1, "title": "Learn Ember.js", "isCompleted": true},
+ 	{"id": 2, "title": "...", "isCompleted": false},
+ 	{"id": 3, "title": "Profit!", "isCompleted": false}
 ];
 
-app.get('/', function(req, res){
+
+app.all('*', function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "X-Requested-With, Content-Type, Accept");
+  //res.header('Access-Control-Allow-Methods: GET, POST, PUT, OPTIONS');
+  next();
+ });
+
+app.get('/', function(req, res, next){
 	//res.redirect('/employees');
 	res.type('text/plain');
 	//res.type('application/json');
@@ -39,25 +48,26 @@ function addTodo(req, res){
 	console.log("body: " + req);
 	var conttyp = req.header('Content-Type');
 	console.log('content-type' + conttyp);
-	if(conttyp == 'application/json'){
-		var todo = JSON.parse(req.body);
-		console.log('Adding employee: ' + JSON.stringify(employee));
+	//if(conttyp == 'application/json'){
+		var todo = req.body.todo;
+		console.log('Adding employee: ' + JSON.stringify(todo));
 		todos.push(todo);
 		res.send(201, 'todo added');
-	}else{
-		res.send(501);
-	}
+	//}else{
+	//	res.send(501);
+	//}
 }
 
 function findAll(req, res){
 	console.log('Retrieving all todos');
 	var accept = req.header('Accept');
-	if(accept == 'json'){
+	//if(accept == 'json'){
 		console.log('returning json');
-		res.json(todos);
-	}else{
-		res.send(406);//Not Acceptable. Only capable of generating content not acceptable according to the Accept headers
-	}
+		var jsonTodo = {"todos": todos};
+		res.json(jsonTodo);
+	//}else{
+	//	res.send(406);//Not Acceptable. Only capable of generating content not acceptable according to the Accept headers
+	//}
 }
 
 function findById(req, res){
@@ -67,7 +77,7 @@ function findById(req, res){
     var elemPos = indexOfTodo(id);
     if(elemPos >= 0){
     	if(accept == 'json'){
-    		res.json(todos[elemPos]);
+    		res.json({"todo": todos[elemPos]});
     	}else{
 			res.send(406);//Not Acceptable. Only capable of generating content not acceptable according to the Accept headers
 		}
