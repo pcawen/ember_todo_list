@@ -5,6 +5,7 @@ var app = express();
 
 app.use(bodyParser());
 
+var idSequence = 4;
 
 var todos = [
 	{"id": 1, "title": "Learn Ember.js", "isCompleted": true},
@@ -16,7 +17,7 @@ var todos = [
 app.all('*', function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "X-Requested-With, Content-Type, Accept");
-  //res.header('Access-Control-Allow-Methods: GET, POST, PUT, OPTIONS');
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   next();
  });
 
@@ -51,8 +52,11 @@ function addTodo(req, res){
 	//if(conttyp == 'application/json'){
 		var todo = req.body.todo;
 		console.log('Adding employee: ' + JSON.stringify(todo));
+		todo.id = idSequence;
+		idSequence++;
 		todos.push(todo);
-		res.send(201, 'todo added');
+		//res.send(201, 'todo added');
+		res.send({"todo": todo});//Ember take this object whith server data(Ej: Id) to replace the current one
 	//}else{
 	//	res.send(501);
 	//}
@@ -92,18 +96,21 @@ function updateTodo(req, res){
 	var conttyp = req.header('Content-Type');
 	console.log('Updting todo: ' + id);
 	var elemPos = indexOfTodo(id);
-	console.log('Request: ' + req.body);
-	console.log("json.stringify" + JSON.stringify(req.body));
-	if(conttyp == 'application/json'){
-		todo = req.body;
-	}else{
-		res.send(501);
-	}
+	console.log('Request: ' + req.body.todo);
+	console.log("json.stringify" + JSON.stringify(req.body.todo));
+	//if(conttyp == 'application/json'){
+		todo = req.body.todo;
+	//}else{
+	//	res.send(501);
+	//}
+	console.log("elementPosition : " + elemPos);
 	if(elemPos >= 0){
-		console.log('Updating todo' + todo);
+		console.log('Updating todo' + todos[elemPos]);
     	todos.splice(elemPos,1);
+    	todo.id = id;
     	todos.push(todo);
-    	res.send(201, 'todo updated');
+    	//res.send(201, 'todo updated');
+    	res.send({"todo": todo});//ember expects the json object as a response to PUT
     }else{
     	res.send(404, 'Todo not found'); //Or should be 204
     }
@@ -123,8 +130,11 @@ function deleteTodo(req, res){
 }
 
 function indexOfTodo(id){
+	console.log(id);
 	for(var i = 0; i < todos.length; i++){
+		console.log(i);
     	if(todos[i].id == id){
+    		console.log("element found");
     		return i;
     	}
     }
