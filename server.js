@@ -49,7 +49,7 @@ function addTodo(req, res){
 	console.log("body: " + req);
 	var conttyp = req.header('Content-Type');
 	console.log('content-type' + conttyp);
-	//if(conttyp == 'application/json'){
+	if(conttyp.indexOf('application/json') > -1){
 		var todo = req.body.todo;
 		console.log('Adding employee: ' + JSON.stringify(todo));
 		todo.id = idSequence;
@@ -57,21 +57,21 @@ function addTodo(req, res){
 		todos.push(todo);
 		//res.send(201, 'todo added');
 		res.send({"todo": todo});//Ember take this object whith server data(Ej: Id) to replace the current one
-	//}else{
-	//	res.send(501);
-	//}
+	}else{
+		res.send(501);
+	}
 }
 
 function findAll(req, res){
 	console.log('Retrieving all todos');
 	var accept = req.header('Accept');
-	//if(accept == 'json'){
+	if(accept.indexOf('json') > -1){
 		console.log('returning json');
 		var jsonTodo = {"todos": todos};
 		res.json(jsonTodo);
-	//}else{
-	//	res.send(406);//Not Acceptable. Only capable of generating content not acceptable according to the Accept headers
-	//}
+	}else{
+		res.send(406);//Not Acceptable. Only capable of generating content not acceptable according to the Accept headers
+	}
 }
 
 function findById(req, res){
@@ -98,23 +98,22 @@ function updateTodo(req, res){
 	var elemPos = indexOfTodo(id);
 	console.log('Request: ' + req.body.todo);
 	console.log("json.stringify" + JSON.stringify(req.body.todo));
-	//if(conttyp == 'application/json'){
+	if(conttyp.indexOf('application/json') > -1){
 		todo = req.body.todo;
-	//}else{
-	//	res.send(501);
-	//}
-	console.log("elementPosition : " + elemPos);
-	if(elemPos >= 0){
-		console.log('Updating todo' + todos[elemPos]);
-    	todos.splice(elemPos,1);
-    	todo.id = id;
-    	todos.push(todo);
-    	//res.send(201, 'todo updated');
-    	res.send({"todo": todo});//ember expects the json object as a response to PUT
-    }else{
-    	res.send(404, 'Todo not found'); //Or should be 204
-    }
-
+		console.log("elementPosition : " + elemPos);
+		if(elemPos >= 0){
+			console.log('Updating todo' + todos[elemPos]);
+	    	todos.splice(elemPos,1);
+	    	todo.id = id;
+	    	todos.push(todo);
+	    	//res.send(201, 'todo updated');
+	    	res.send({"todo": todo});//ember expects the json object as a response to PUT
+	    }else{
+	    	res.send(404, 'Todo not found'); //Or should be 204
+	    }
+	}else{
+		res.send(501);
+	}
 }
 
 function deleteTodo(req, res){
